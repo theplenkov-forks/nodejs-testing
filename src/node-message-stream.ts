@@ -43,7 +43,14 @@ export class NodeJsMessageStream extends BaseMessageStream {
   }
 
   public close(): void {
-    this.writeStream.end();
+    this.writeStream.end(() => {
+      if (typeof (this.readStream as any).destroy === "function") {
+        (this.readStream as any).destroy();
+      }
+      if (typeof (this.writeStream as any).destroy === "function") {
+        (this.writeStream as any).destroy();
+      }
+    });
   }
 
   public dispose(): void {
