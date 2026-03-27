@@ -1,5 +1,5 @@
 import { Contract } from "@hediet/json-rpc";
-import { NodeJsMessageStream } from "@hediet/json-rpc-streams/src";
+import { NodeJsMessageStream } from "./node-message-stream";
 import * as ansiColors from "ansi-colors";
 import { spawn } from "child_process";
 import { promises as fs } from "fs";

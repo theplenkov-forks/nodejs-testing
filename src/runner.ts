@@ -1,6 +1,6 @@
 import { replaceVariables } from "@c4312/vscode-variables";
 import { Contract } from "@hediet/json-rpc";
-import { NodeJsMessageStream } from "@hediet/json-rpc-streams/src";
+import { NodeJsMessageStream } from "./node-message-stream";
 import { spawn } from "child_process";
 import { randomUUID } from "crypto";
 import { parse as parseEnv } from "dotenv";
