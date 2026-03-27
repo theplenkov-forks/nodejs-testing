@@ -1,4 +1,5 @@
 import { Message, BaseMessageStream } from "@hediet/json-rpc";
+import split from "split2";
 
 /**
  * Wraps a write and read stream for JSON-RPC message communication.
@@ -15,28 +16,30 @@ export class NodeJsMessageStream extends BaseMessageStream {
 
     let closed = false;
 
-    readStream.on("data", (chunk: any) => {
-      const str = chunk.toString("utf8");
-      const parts = str.trim().split("\n");
-      for (const p of parts) {
-        const obj = JSON.parse(p) as Message;
+    const closedOnce = () => {
+      if (!closed) {
+        closed = true;
+        this.onConnectionClosed();
+      }
+    };
+
+    readStream.pipe(split()).on("data", (line: string) => {
+      if (!line) {
+        return;
+      }
+      try {
+        const obj = JSON.parse(line) as Message;
         this.onMessage(obj);
+      } catch {
+        // ignore malformed lines
       }
     });
 
-    readStream.on("close", () => {
-      if (!closed) {
-        closed = true;
-        this.onConnectionClosed();
-      }
-    });
+    readStream.on("close", closedOnce);
+    readStream.on("error", closedOnce);
 
-    writeStream.on("close", () => {
-      if (!closed) {
-        closed = true;
-        this.onConnectionClosed();
-      }
-    });
+    writeStream.on("close", closedOnce);
+    writeStream.on("error", closedOnce);
   }
 
   public close(): void {
